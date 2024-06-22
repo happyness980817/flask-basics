@@ -3,17 +3,35 @@ import random
 
 app = Flask(__name__)
 
-# 어떤 요청을 어떤 함수가 응답할 것인가를 연결시키는 작업 -> 라우팅
+topics = [
+    {'id':1, 'title': 'html', 'body': 'html is ...'},
+    {'id':2, 'title': 'css', 'body': 'css is ...'},
+    {'id':3, 'title': 'js', 'body': 'js is ...'},
+] # 데이터베이스에서 데이터 불러오기
+
 
 @app.route('/')
 def index():
-    return 'Welcome' 
+    liTags = ''
+    for topic in topics:
+        liTags += f'<li><a href="/read/{topic["id"]}/">{topic["title"]}</a></li>'
+    return f'''<!doctype html>
+        <html>
+            <body>
+                <h1><a href="/">Hello</a></h1>
+                <ol>
+                    {liTags}
+                </ol>
+            </body>
+        </html>
+    
+    '''
 
 @app.route('/create/')
 def create():
     return 'Create'
 
-@app.route('/read/<id>/') # Variable Rules
+@app.route('/read/<id>/') 
 def read(id):
     return 'Read '+id
 
