@@ -3,9 +3,19 @@ import random
 
 app = Flask(__name__)
 
+# 어떤 요청을 어떤 함수가 응답할 것인가를 연결시키는 작업 -> 라우팅
+
 @app.route('/')
 def index():
-    return 'random : <strong>' +str(random.random())+'</strong>' # 브라우저에 html 전달
+    return 'Welcome' 
 
-app.run(debug=True) #서버 닫지 않아도 새로고침하면 변경사항 반영, 실제 서비스시에는 X
+@app.route('/create/')
+def create():
+    return 'Create'
+
+@app.route('/read/<id>/') # Variable Rules
+def read(id):
+    return 'Read '+id
+
+app.run(debug=True) 
 
