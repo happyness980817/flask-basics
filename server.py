@@ -17,6 +17,9 @@ def template(contents, content):
                     {contents}
                 </ol>
                 {content}
+                <ul>
+                    <li><a href="/create/">create</a></li>
+                </ul>    
             </body>
         </html>
     
@@ -34,7 +37,15 @@ def index():
 
 @app.route('/create/')
 def create():
-    return 'Create'
+    content = '''
+        <form action="/create/" method="POST"> 
+            <p><input type="text" name="title" placeholder="title"></p>
+            <p><textarea name="body" placeholder="body"></textarea></p>  
+            <p><input type="submit" value="create"></p>
+        </form>
+    '''
+    # POST 방식 - 데이터가 url 을 통해 전송되지 않음. 데이터를 사용자가 변경할 때 사용
+    return template(getContents(),content)
 
 @app.route('/read/<int:id>/') # 읽기, id 정수로 지정
 def read(id):
