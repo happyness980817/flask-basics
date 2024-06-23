@@ -7,7 +7,7 @@ topics = [
     {'id':1, 'title': 'html', 'body': 'html is ...'},
     {'id':2, 'title': 'css', 'body': 'css is ...'},
     {'id':3, 'title': 'js', 'body': 'js is ...'},
-]
+] # 데이터베이스에서 데이터 불러오기
 
 def template(contents, content):
     return f'''<!doctype html>
@@ -32,9 +32,13 @@ def getContents():
         liTags += f'<li><a href="/read/{topic["id"]}/">{topic["title"]}</a></li>'
     return liTags
 
-@app.route('/')
+@app.route('/') # We then use the route() decorator to tell Flask what URL should trigger our function.
 def index():
     return template(getContents(), '<h2>Welcome</h2>Hello, WEB')
+
+# The function returns the message we want to display in the user’s browser. 
+# The default content type is HTML, so HTML in the string
+# will be rendered by the browser.
 
 @app.route('/create/', methods=['GET','POST']) # get 이 아닌 method 허용할 시 methods 지정
 def create():
@@ -48,7 +52,9 @@ def create():
         '''
     elif request.method == 'POST':
         global nextId # 외부에서 생성된 전역변수 초기값 참조
-        title = request.form['title']
+        title = request.form['title'] # To access form data 
+        # (data transmitted in a POST or PUT request) 
+        # you can use the form attribute. 
         body = request.form['body']
         newTopic = {'id':nextId, 'title': title, 'body': body}
         topics.append(newTopic)
@@ -59,7 +65,7 @@ def create():
     # POST 방식(method) - 데이터가 url 을 통해 전송되지 않음. 데이터를 사용자가 변경할 때 사용
     return template(getContents(),content)
 
-@app.route('/read/<int:id>/') # 읽기, id 정수로 지정
+@app.route('/read/<int:id>/') # Variable Rules - 읽기, id 정수로 지정
 def read(id):
     # print(type(id)) 
     # 변환전에는 str
@@ -74,5 +80,5 @@ def read(id):
     return template(getContents(), f'<h2>{title}</h2>{body}') 
 
 
-app.run(debug=True) 
+app.run(debug=True) #서버 닫지 않아도 새로고침하면 변경사항 반영, 실제 서비스시에는 X
 
