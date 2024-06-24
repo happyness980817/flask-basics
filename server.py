@@ -9,7 +9,12 @@ topics = [
     {'id':3, 'title': 'js', 'body': 'js is ...'},
 ] # 데이터베이스에서 데이터 불러오기
 
-def template(contents, content):
+def template(contents, content, id=None):
+    contextUI = ''
+    if id != None:
+        contextUI = f'''
+            <li><a href="/update/{id}/">update</a></li>
+        '''
     return f'''<!doctype html>
         <html>
             <body>
@@ -20,6 +25,7 @@ def template(contents, content):
                 {content}
                 <ul>
                     <li><a href="/create/">create</a></li>
+                    {contextUI} 
                 </ul>    
             </body>
         </html>
@@ -39,6 +45,20 @@ def index():
 # The function returns the message we want to display in the user’s browser. 
 # The default content type is HTML, so HTML in the string
 # will be rendered by the browser.
+
+@app.route('/read/<int:id>/') # Variable Rules - 읽기, id 정수로 지정
+def read(id):
+    # print(type(id)) 
+    # 변환전에는 str
+    title = ''
+    body = ''
+    for topic in topics:
+        if id == topic['id']:
+            title = topic['title']
+            body = topic['body']
+            break
+    # print(title,body)
+    return template(getContents(), f'<h2>{title}</h2>{body}', id) 
 
 @app.route('/create/', methods=['GET','POST']) # get 이 아닌 method 허용할 시 methods 지정
 def create():
@@ -65,20 +85,35 @@ def create():
     # POST 방식(method) - 데이터가 url 을 통해 전송되지 않음. 데이터를 사용자가 변경할 때 사용
     return template(getContents(),content)
 
-@app.route('/read/<int:id>/') # Variable Rules - 읽기, id 정수로 지정
-def read(id):
-    # print(type(id)) 
-    # 변환전에는 str
-    title = ''
-    body = ''
-    for topic in topics:
-        if id == topic['id']:
-            title = topic['title']
-            body = topic['body']
-            break
-    # print(title,body)
-    return template(getContents(), f'<h2>{title}</h2>{body}') 
+@app.route('/update/<int:id>/', methods=['GET','POST']) 
+def update(id):
+    if request.method == 'GET':
+        title = ''
+        body = ''
+        for topic in topics:
+            if id == topic['id']:
+                title = topic['title']
+                body = topic['body']
+                break
+        content = f'''
+            <form action="/update/{id}/" method="POST"> 
+                <p><input type="text" name="title" placeholder="title" value="{title}"></p>
+                <p><textarea name="body" placeholder="body">{body}</textarea></p>  
+                <p><input type="submit" value="update"></p>
+            </form>
+        ''' # 요기는 기존의 데이터 가져오는 부분 (수정할것들)(read)
+    elif request.method == 'POST':
+        title = request.form['title'] 
+        body = request.form['body']
+        for topic in topics:
+            if id == topic['id']:
+                topic['title'] = title
+                topic['body'] = body
+                break
+        url = '/read/' + str(id) + '/'
+        return redirect(url) 
 
+    return template(getContents(),content)
 
 app.run(debug=True) #서버 닫지 않아도 새로고침하면 변경사항 반영, 실제 서비스시에는 X
 
