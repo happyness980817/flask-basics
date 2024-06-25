@@ -11,9 +11,10 @@ topics = [
 
 def template(contents, content, id=None):
     contextUI = ''
-    if id != None:
+    if id != None: # update, delete 는 id 가 있을때만 사용
         contextUI = f'''
             <li><a href="/update/{id}/">update</a></li>
+            <li><form action="/delete/{id}/" method="POST"><input type="submit" value="delete"></form></li>
         '''
     return f'''<!doctype html>
         <html>
@@ -46,7 +47,7 @@ def index():
 # The default content type is HTML, so HTML in the string
 # will be rendered by the browser.
 
-@app.route('/read/<int:id>/') # Variable Rules - 읽기, id 정수로 지정
+@app.route('/read/<int:id>/') # Variable Rules - id 정수로 지정
 def read(id):
     # print(type(id)) 
     # 변환전에는 str
@@ -114,6 +115,14 @@ def update(id):
         return redirect(url) 
 
     return template(getContents(),content)
+
+@app.route('/delete/<int:id>/', methods=['POST']) 
+def delete(id):
+    for topic in topics:
+        if id == topic['id']:
+            topics.remove(topic)
+            break
+    return redirect('/')
 
 app.run(debug=True) #서버 닫지 않아도 새로고침하면 변경사항 반영, 실제 서비스시에는 X
 
